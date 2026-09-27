@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#58cc02">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Regex Fun">
+  <meta name="format-detection" content="telephone=no">
+  <title>Regex Fun — Objectif ANACRIM</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <style>
+    :root {
+      --green:#58cc02; --green-dark:#46a302; --green-soft:#eaf9dc;
+      --blue:#1cb0f6; --blue-dark:#158ec7; --blue-soft:#e9f7ff;
+      --yellow:#ffd900; --yellow-soft:#fff9cf;
+      --orange:#ff9f1c; --red:#ff4b4b; --pink:#ff72b6; --purple:#7c5cff;
+      --bg:#f7f8fc; --card:#fff; --text:#24324a; --muted:#6d7890; --border:#e4eaf2;
+      --shadow:0 8px 0 rgba(36,50,74,.07),0 16px 30px rgba(36,50,74,.10);
+      --radius:24px; --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#f8fff4 0%,#f6fbff 38%,#fff8fd 100%);color:var(--text);font-family:ui-rounded,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{min-height:100vh;overscroll-behavior-y:none}
+    button,input,textarea,select{font:inherit}
+    button{touch-action:manipulation}
+    .app{width:min(100%,560px);margin:0 auto;min-height:100vh;padding:calc(14px + var(--safe-top)) 15px calc(18px + var(--safe-bottom));position:relative}
+    .hidden{display:none!important}.screen{animation:screenIn .22s ease}@keyframes screenIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .logo{display:flex;align-items:center;gap:10px;min-width:0}.logo-title{font-size:1.08rem;font-weight:1000;line-height:1.05}.logo-sub{font-size:.8rem;color:var(--muted);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+    .mascot{width:52px;height:52px;border-radius:18px;background:linear-gradient(180deg,#71e719,#48b202);box-shadow:0 8px 0 rgba(70,163,2,.32);position:relative;overflow:hidden;flex:0 0 auto;transform-origin:50% 90%}
+    .mascot:before,.mascot:after{content:"";position:absolute;top:17px;width:9px;height:11px;border-radius:50%;background:#fff}.mascot:before{left:14px}.mascot:after{right:14px}.mascot .mouth{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:20px;height:9px;border:3px solid #fff;border-top:0;border-radius:0 0 15px 15px}.mascot.happy{animation:hop .5s ease}.mascot.sad{animation:shake .35s ease}@keyframes hop{0%,100%{transform:none}45%{transform:translateY(-8px) rotate(-3deg)}}@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+    .pill-wrap{display:flex;gap:7px}.pill{background:#fff;border:2px solid var(--border);border-radius:999px;padding:9px 11px;display:flex;align-items:center;gap:6px;font-weight:1000;box-shadow:0 3px 0 rgba(36,50,74,.04);font-size:.88rem}.streak-pill{color:var(--orange)}.xp-pill{color:var(--blue-dark)}
+
+    .hero{background:linear-gradient(135deg,#dff7c8 0%,#efffe3 46%,#d7f3ff 100%);border-radius:30px;padding:20px;box-shadow:var(--shadow);border:3px solid #fff;position:relative;overflow:hidden;margin-bottom:15px}.hero h1{margin:0 0 7px;font-size:1.55rem;line-height:1.05;max-width:85%}.hero p{margin:0 0 14px;color:#48607c;font-weight:800;line-height:1.35}.hero .bubble{position:absolute;border-radius:50%;opacity:.32;pointer-events:none}.b1{right:-22px;top:-16px;width:100px;height:100px;background:var(--purple)}.b2{right:75px;bottom:-25px;width:78px;height:78px;background:var(--yellow)}.b3{left:-16px;bottom:-14px;width:68px;height:68px;background:var(--blue)}
+    .goal-label{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:14px 0 7px;font-size:.85rem;font-weight:1000}.goal-label span:last-child{color:#4c6b85}
+    .progressbar{height:16px;background:#eaf0f6;border-radius:999px;overflow:hidden;border:2px solid #dce5ef}.progressbar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#58cc02,#8be73d);border-radius:inherit;transition:width .35s ease}.progressbar.blue>span{background:linear-gradient(90deg,#1cb0f6,#77d6ff)}
+
+    .btn{appearance:none;border:none;border-radius:18px;padding:14px 17px;font-weight:1000;cursor:pointer;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .08s ease,filter .12s ease;box-shadow:inset 0 -4px 0 rgba(0,0,0,.12);min-height:48px}.btn:active{transform:translateY(2px)}.btn:disabled{opacity:.55;filter:grayscale(.25);cursor:not-allowed}.btn-primary{background:var(--green)}.btn-secondary{background:var(--blue)}.btn-purple{background:var(--purple)}.btn-orange{background:var(--orange)}.btn-danger{background:var(--red)}.btn-soft{background:#fff;color:var(--text);border:2px solid var(--border);box-shadow:0 5px 0 rgba(36,50,74,.04)}.btn-wide{width:100%}.row{display:flex;gap:10px;flex-wrap:wrap}
+
+    .section-title{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:18px 4px 10px}.section-title h2{margin:0;font-size:1.08rem}.section-title small{color:var(--muted);font-weight:800;text-align:right}
+    .grid{display:grid;gap:12px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;border:2px solid var(--border);box-shadow:var(--shadow)}.card h3{margin:0 0 6px;font-size:1rem}.card p{margin:0;color:var(--muted);font-weight:750;line-height:1.4}
+    .quick-card{position:relative;overflow:hidden;min-height:125px;cursor:pointer}.quick-card .qicon{font-size:1.7rem;margin-bottom:8px}.quick-card strong{display:block;margin-bottom:4px}.quick-card small{color:var(--muted);font-weight:750;line-height:1.3}.quick-card:active{transform:translateY(2px)}
+    .quick-green{background:linear-gradient(180deg,#effbdd,#fff)}.quick-blue{background:linear-gradient(180deg,#e8f7ff,#fff)}.quick-purple{background:linear-gradient(180deg,#f0ebff,#fff)}
+
+    .tiny-stat{background:#f8fbff;border-radius:18px;padding:13px;border:2px solid var(--border);text-align:center}.tiny-stat .num{font-size:1.32rem;font-weight:1000}.tiny-stat .label{color:var(--muted);font-size:.78rem;font-weight:850;line-height:1.15}
+    .chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{border-radius:999px;background:#eef9e4;color:#397a00;padding:8px 10px;font-weight:1000;font-size:.78rem}.chip.blue{background:#e8f6ff;color:#156f9b}.chip.purple{background:#f1ecff;color:#5b44c5}
+
+    .roadmap{display:grid;gap:13px}.lesson-card{position:relative;overflow:hidden;padding-left:72px;min-height:132px}.lesson-node{position:absolute;left:15px;top:17px;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:1000;font-size:1.18rem;background:#eef9e4;color:#3b7c00;box-shadow:0 5px 0 #d7edc4}.lesson-card.done .lesson-node{background:var(--green);color:white;box-shadow:0 5px 0 var(--green-dark)}.lesson-card.boss .lesson-node{background:var(--purple);color:white;box-shadow:0 5px 0 #5e48c0}.lesson-tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#eef5ff;padding:6px 9px;color:#3570b8;font-size:.72rem;font-weight:1000;margin-bottom:7px}.lesson-card h3{margin-right:60px}.lesson-score{position:absolute;right:14px;top:14px;font-size:.78rem;font-weight:1000;color:var(--muted)}.lesson-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}.lesson-footer strong{font-size:.85rem}
+
+    .nav{position:sticky;bottom:8px;z-index:20;margin-top:16px;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border:2px solid rgba(230,235,242,.96);box-shadow:0 10px 28px rgba(36,50,74,.14);border-radius:27px;padding:9px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.nav button{border:none;background:transparent;border-radius:18px;padding:9px 5px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-weight:1000;font-size:.7rem;cursor:pointer}.nav button.active{background:#eef9e4;color:var(--green-dark)}.nav .ico{font-size:1.1rem}
+    .footer-note{font-size:.78rem;color:var(--muted);text-align:center;padding:10px 14px 0;font-weight:750}
+
+    .lesson-header{display:flex;align-items:center;gap:10px;margin-bottom:11px}.lesson-header .circle{width:48px;height:48px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:1000;background:#eef9e4;color:var(--green-dark)}.subtitle{color:var(--muted);font-weight:780;line-height:1.35}.hearts{display:flex;gap:3px;font-size:1.15rem}.session-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;font-size:.78rem;color:var(--muted);font-weight:850}
+    .exercise-card{background:#fff;border:2px solid var(--border);border-radius:29px;padding:18px;box-shadow:var(--shadow);margin-top:12px}.question-label{color:var(--purple);font-size:.78rem;font-weight:1000;margin-bottom:8px}.question{font-size:1.13rem;font-weight:1000;line-height:1.35;margin:0 0 14px}.code-block{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f6f8fb;border:2px solid #e3e8ef;border-radius:18px;padding:14px;font-size:.96rem;line-height:1.5;overflow:auto}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:1000}.answer-grid{display:grid;gap:10px}.choice{text-align:left;background:#fff;color:var(--text);border:2px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 5px 0 rgba(36,50,74,.04);font-weight:1000;min-height:50px}.choice.selected{border-color:#9fd5ff;background:#f1f9ff}.choice.correct{border-color:#79d727;background:#effadc}.choice.wrong{border-color:#ff9f9f;background:#fff0f0}.input-answer,.play-input,textarea{width:100%;border-radius:18px;border:2px solid var(--border);padding:14px 15px;background:#fff;box-shadow:inset 0 1px 0 rgba(0,0,0,.03)}textarea{min-height:126px;resize:vertical}.sample-tests{margin-top:10px;background:#f7f9fc;border-radius:16px;padding:10px 12px;border:2px solid #edf0f5;font-size:.85rem;font-weight:800;color:#52627b}.sample-tests code{font-family:ui-monospace,monospace}
+    .hint,.explanation{margin-top:12px;background:#fff8d9;border:2px solid #ffe799;padding:12px 14px;border-radius:18px;color:#7a6500;font-weight:850;line-height:1.45}.explanation.good{background:#eafadc;border-color:#bde68d;color:#2c5e00}.explanation.bad{background:#fff0f0;border-color:#ffb7b7;color:#8c2626}
+
+    .success-panel{background:linear-gradient(180deg,#e8f8da,#fff);border-radius:29px;border:2px solid #cce7a8;padding:20px;box-shadow:var(--shadow)}.success-emoji{font-size:3.2rem;line-height:1}.center{text-align:center}.result-note{background:#f7fbff;border:2px solid var(--border);border-radius:18px;padding:12px;margin-top:12px;color:var(--muted);font-weight:800}
+
+    .lab-output{min-height:120px;white-space:pre-wrap;background:#fff;border:2px dashed #cfd9e5;border-radius:18px;padding:14px;font-family:ui-monospace,monospace;line-height:1.55;overflow-wrap:anywhere}.match{background:var(--yellow);padding:1px 2px;border-radius:6px;font-weight:1000}.badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:#f4f7ff;padding:8px 11px;font-weight:1000;font-size:.82rem}.muted{color:var(--muted)}
+    .memo-grid{display:grid;gap:10px}.memo-item{background:#fff;border:2px solid var(--border);border-radius:21px;padding:14px;box-shadow:0 6px 0 rgba(36,50,74,.04)}.memo-item strong{display:block;font-size:1rem;margin-bottom:7px}.memo-item .example{margin-top:8px;background:#f7f9fc;border-radius:13px;padding:9px 10px;font-size:.88rem}
+    .weak-row{display:flex;align-items:center;gap:10px;margin-top:10px}.weak-row .grow{flex:1}.weak-row .bar{height:10px;border-radius:999px;background:#eef1f5;overflow:hidden}.weak-row .bar span{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--red));border-radius:inherit}.weak-row small{font-weight:900;color:var(--muted)}
+
+    .install-step{display:flex;gap:12px;align-items:flex-start;margin-top:12px}.install-step .n{width:36px;height:36px;border-radius:13px;background:var(--blue);color:#fff;font-weight:1000;display:flex;align-items:center;justify-content:center;flex:0 0 auto}.install-step strong{display:block;margin-bottom:3px}
+    .setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.setting-row:last-child{border-bottom:0}.toggle{width:54px;height:31px;border-radius:999px;background:#cfd8e3;padding:3px;cursor:pointer;transition:.2s}.toggle span{display:block;width:25px;height:25px;background:#fff;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,.15);transition:.2s}.toggle.on{background:var(--green)}.toggle.on span{transform:translateX(23px)}
+
+    .overlay{position:fixed;inset:0;z-index:50;background:rgba(27,36,54,.48);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:12px}.sheet{width:min(100%,560px);background:#fff;border-radius:30px 30px 22px 22px;padding:20px;box-shadow:0 -12px 40px rgba(0,0,0,.18);max-height:88vh;overflow:auto}.sheet h2{margin:0 0 6px}.onboard-option{border:2px solid var(--border);border-radius:20px;padding:14px;margin-top:10px;cursor:pointer}.onboard-option.selected{border-color:#94d957;background:#f1fbe8}.onboard-option strong{display:block;margin-bottom:4px}.onboard-option p{margin:0;color:var(--muted);font-weight:750}
+
+    .confetti{position:fixed;z-index:80;pointer-events:none;font-size:1.3rem;animation:confettiFall 1.2s ease-out forwards}@keyframes confettiFall{0%{opacity:1;transform:translateY(-10px) rotate(0deg) scale(.8)}100%{opacity:0;transform:translateY(220px) rotate(240deg) scale(1.2)}}
+    .pulse{animation:pulse .45s ease}@keyframes pulse{50%{transform:scale(1.04)}}
+
+    @media(max-width:410px){.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.topbar{align-items:flex-start}.pill-wrap{flex-direction:column;gap:4px}.pill{padding:7px 9px;font-size:.8rem}.logo-sub{max-width:180px}.hero h1{max-width:100%}.lesson-card{padding-left:66px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div id="screen-home" class="screen">
+    <div class="topbar">
+      <div class="logo">
+        <div class="mascot" id="mascot"><div class="mouth"></div></div>
+        <div><div class="logo-title">Regex Fun</div><div class="logo-sub">Objectif ANACRIM • décembre</div></div>
+      </div>
+      <div class="pill-wrap">
+        <div class="pill streak-pill">🔥 <span id="streakValue">0</span></div>
+        <div class="pill xp-pill">⭐ <span id="xpValue">0 XP</span></div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="bubble b1"></div><div class="bubble b2"></div><div class="bubble b3"></div>
+      <h1>Un peu chaque jour, jusqu’aux réflexes 🎯</h1>
+      <p id="heroText">Leçons très courtes, correction expliquée, révision des erreurs et défis mélangés.</p>
+      <div class="row">
+        <button class="btn btn-primary" id="continueBtn">▶ Continuer</button>
+        <button class="btn btn-purple" onclick="startQuickSession()">⚡ Session express</button>
+      </div>
+      <div class="goal-label"><span>Objectif du jour</span><span id="dailyGoalLabel">0 / 30 XP</span></div>
+      <div class="progressbar"><span id="dailyGoalProgress"></span></div>
+    </div>
+
+    <div class="section-title"><h2>Modes d’entraînement</h2><small>Selon ton énergie du moment</small></div>
+    <div class="grid grid-3">
+      <div class="card quick-card quick-green" onclick="startDailyMission()"><div class="qicon">🎯</div><strong>Mission du jour</strong><small>5 questions variées, différentes chaque jour.</small></div>
+      <div class="card quick-card quick-blue" onclick="startQuickSession()"><div class="qicon">⚡</div><strong>5 minutes</strong><small>Priorité aux notions que tu rates le plus.</small></div>
+      <div class="card quick-card quick-purple" onclick="startExam()"><div class="qicon">🏆</div><strong>Défi ANACRIM</strong><small>10 questions mélangées, sans filet.</small></div>
+    </div>
+
+    <div class="section-title"><h2>Ta progression</h2><small id="courseSummary">0 / 9 niveaux validés</small></div>
+    <div class="card">
+      <div class="progressbar blue"><span id="courseProgress"></span></div>
+      <div class="chip-row" id="achievements"></div>
+    </div>
+
+    <div class="section-title"><h2>Vue rapide</h2><small id="levelLabel">Niveau : Novice</small></div>
+    <div class="grid grid-3">
+      <div class="tiny-stat"><div class="num" id="lessonsDone">0</div><div class="label">Niveaux terminés</div></div>
+      <div class="tiny-stat"><div class="num" id="mistakesCount">0</div><div class="label">Erreurs à revoir</div></div>
+      <div class="tiny-stat"><div class="num" id="examBest">—</div><div class="label">Meilleur défi</div></div>
+    </div>
+
+    <div class="section-title"><h2>Parcours « je pars de zéro »</h2><small>Progression conseillée</small></div>
+    <div class="roadmap" id="lessonList"></div>
+
+    <div class="section-title"><h2>Réglages rapides</h2><small>Son et installation</small></div>
+    <div class="grid grid-2">
+      <button class="btn btn-soft btn-wide" onclick="showInstall()">📱 Installer sur iPhone</button>
+      <button class="btn btn-soft btn-wide" onclick="showSettings()">⚙️ Réglages</button>
+    </div>
+  </div>
+
+  <div id="screen-learn" class="screen hidden">
+    <div class="topbar">
+      <button class="btn btn-soft" onclick="confirmLeaveSession()">← Quitter</button>
+      <div class="hearts" id="heartBox">❤️❤️❤️</div>
+    </div>
+    <div class="lesson-header">
+      <div class="circle" id="lessonEmoji">1</div>
+      <div><h2 id="lessonTitle" style="margin:0"></h2><div class="subtitle" id="lessonDesc"></div></div>
+    </div>
+    <div class="progressbar"><span id="lessonProgress"></span></div>
+    <div class="session-meta"><span id="sessionQuestionCount"></span><span id="sessionScore"></span></div>
+    <div class="exercise-card" id="exerciseCard"></div>
+  </div>
+
+  <div id="screen-results" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Accueil</button></div>
+    <div class="success-panel center">
+      <div class="success-emoji" id="resultEmoji">🏆</div>
+      <h2 id="resultTitle">Session terminée !</h2>
+      <p id="resultText" class="subtitle"></p>
+      <div class="grid grid-3" style="margin:18px 0">
+        <div class="tiny-stat"><div class="num" id="resultScore">0%</div><div class="label">Score</div></div>
+        <div class="tiny-stat"><div class="num" id="resultXP">0 XP</div><div class="label">Gagnés</div></div>
+        <div class="tiny-stat"><div class="num" id="resultHearts">0</div><div class="label">Vies restantes</div></div>
+      </div>
+      <div class="result-note" id="resultNote"></div>
+      <div class="row" style="justify-content:center;margin-top:15px">
+        <button class="btn btn-primary" id="resultPrimaryBtn">Continuer</button>
+        <button class="btn btn-secondary" onclick="showScreen('review')">Réviser mes erreurs</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-lab" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Retour</button><span class="badge">🧪 Terrain d’essai</span></div>
+    <div class="card"><h3>Labo REGEX</h3><p>Teste une expression sans risque : le labo limite la taille des entrées et coupe les calculs trop longs.</p></div>
+    <div class="card" style="margin-top:12px">
+      <label><strong>Ta REGEX</strong></label><input id="labRegex" class="play-input mono" maxlength="120" placeholder="Ex. ^\d{5}$" value="^\d{5}$">
+      <div class="row" style="margin-top:10px"><label class="badge"><input type="checkbox" id="flagI"> i</label><label class="badge"><input type="checkbox" id="flagG" checked> g</label><label class="badge"><input type="checkbox" id="flagM"> m</label></div>
+    </div>
+    <div class="card" style="margin-top:12px"><label><strong>Texte à tester</strong></label><textarea id="labText" maxlength="5000">39000
+7500
+ABCDE
+39000 Paris</textarea></div>
+    <div class="row" style="margin-top:12px"><button class="btn btn-primary" onclick="runLab()">▶ Tester</button><button class="btn btn-secondary" onclick="explainRegex()">🧩 Décomposer</button></div>
+    <div class="card" style="margin-top:12px"><h3>Résultat</h3><div id="labOutput" class="lab-output">Appuie sur « Tester »…</div></div>
+    <div class="card" style="margin-top:12px"><h3>Décodeur visuel</h3><div id="explainOutput" class="lab-output muted">Appuie sur « Décomposer »…</div></div>
+  </div>
+
+  <div id="screen-memo" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Retour</button><span class="badge">🧠 Mémo</span></div>
+    <div class="section-title"><h2>Les indispensables</h2><small>À relire avant une session</small></div>
+    <div class="memo-grid">
+      <div class="memo-item"><strong>1. Les classes</strong><span class="mono">\d</span> chiffre • <span class="mono">\w</span> lettre/chiffre/_ • <span class="mono">\s</span> espace<div class="example"><span class="mono">\d\d</span> → deux chiffres</div></div>
+      <div class="memo-item"><strong>2. Les crochets</strong><span class="mono">[abc]</span> a/b/c • <span class="mono">[a-z]</span> minuscule • <span class="mono">[^0-9]</span> tout sauf chiffre<div class="example"><span class="mono">[A-Z]</span> → une majuscule</div></div>
+      <div class="memo-item"><strong>3. Les quantificateurs</strong><span class="mono">+</span> 1 ou + • <span class="mono">*</span> 0 ou + • <span class="mono">?</span> 0 ou 1 • <span class="mono">{3}</span> exactement 3<div class="example"><span class="mono">\d{5}</span> → cinq chiffres</div></div>
+      <div class="memo-item"><strong>4. Les ancres</strong><span class="mono">^</span> début • <span class="mono">$</span> fin • <span class="mono">\b</span> frontière de mot<div class="example"><span class="mono">^\d{5}$</span> → uniquement 5 chiffres</div></div>
+      <div class="memo-item"><strong>5. Groupes / choix</strong><span class="mono">( )</span> regroupe • <span class="mono">|</span> signifie « ou »<div class="example"><span class="mono">^(oui|non)$</span></div></div>
+      <div class="memo-item"><strong>6. Échapper</strong>Pour chercher un symbole spécial littéralement, ajoute <span class="mono">\</span> devant.<div class="example"><span class="mono">\.com</span> → « .com »</div></div>
+      <div class="memo-item"><strong>7. Méthode express</strong>1) définir le format • 2) découper • 3) choisir les classes • 4) quantifier • 5) ancrer • 6) tester<div class="example">Toujours tester au moins un cas qui doit passer et un qui doit échouer.</div></div>
+    </div>
+  </div>
+
+  <div id="screen-review" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Retour</button><span class="badge">🔁 Révision ciblée</span></div>
+    <div class="card"><h3>Notions fragiles</h3><p>Les erreurs sont regroupées par notion. L’app te repropose en priorité ce qui te pose problème.</p><div id="weaknessContainer"></div></div>
+    <div class="section-title"><h2>Erreurs enregistrées</h2><small id="reviewCount"></small></div>
+    <div id="reviewContainer"></div>
+  </div>
+
+  <div id="screen-install" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Retour</button><span class="badge">📱 Installation</span></div>
+    <div class="card"><h3>Installer sur l’écran d’accueil de l’iPhone</h3><p>Une fois le dossier hébergé en HTTPS, l’app peut s’ouvrir comme une application autonome et fonctionner hors ligne après le premier chargement.</p></div>
+    <div class="card" style="margin-top:12px">
+      <div class="install-step"><div class="n">1</div><div><strong>Ouvre l’adresse de l’app dans Safari</strong><span class="muted">Safari est le chemin le plus fiable pour l’installation sur iPhone.</span></div></div>
+      <div class="install-step"><div class="n">2</div><div><strong>Appuie sur Partager</strong><span class="muted">Le carré avec la flèche vers le haut.</span></div></div>
+      <div class="install-step"><div class="n">3</div><div><strong>Choisis « Sur l’écran d’accueil »</strong><span class="muted">L’icône Regex Fun sera ajoutée comme une app.</span></div></div>
+      <div class="install-step"><div class="n">4</div><div><strong>Ouvre-la une première fois avec Internet</strong><span class="muted">Le cache hors ligne sera alors préparé.</span></div></div>
+    </div>
+  </div>
+
+  <div id="screen-settings" class="screen hidden">
+    <div class="topbar"><button class="btn btn-soft" onclick="showScreen('home')">← Retour</button><span class="badge">⚙️ Réglages</span></div>
+    <div class="card">
+      <div class="setting-row"><div><strong>Sons de réussite</strong><div class="muted">Petits bips générés localement.</div></div><div class="toggle" id="soundToggle" onclick="toggleSound()"><span></span></div></div>
+      <div class="setting-row"><div><strong>Réinitialiser la progression</strong><div class="muted">Supprime XP, séries, erreurs et niveaux validés.</div></div><button class="btn btn-danger" onclick="resetProgress()">Réinitialiser</button></div>
+    </div>
+  </div>
+
+  <div class="nav" id="bottomNav">
+    <button class="active" data-screen="home" onclick="showScreen('home')"><span class="ico">🏠</span><span>Accueil</span></button>
+    <button data-screen="lab" onclick="showScreen('lab')"><span class="ico">🧪</span><span>Labo</span></button>
+    <button data-screen="memo" onclick="showScreen('memo')"><span class="ico">🧠</span><span>Mémo</span></button>
+    <button data-screen="review" onclick="showScreen('review')"><span class="ico">🔁</span><span>Erreurs</span></button>
+  </div>
+  <div class="footer-note">Regex Fun V2 • hors ligne • aucune donnée envoyée • progression locale</div>
+</div>
+
+<div id="onboarding" class="overlay hidden">
+  <div class="sheet">
+    <div class="mascot happy" style="margin-bottom:14px"><div class="mouth"></div></div>
+    <h2>On part de zéro, sans honte 😄</h2>
+    <p class="subtitle">Choisis juste le rythme. Tu pourras tout faire ensuite.</p>
+    <div class="onboard-option selected" data-mode="gentle" onclick="selectOnboarding(this)"><strong>🌱 Je n’y comprends rien</strong><p>Le parcours recommandé commence vraiment par les bases.</p></div>
+    <div class="onboard-option" data-mode="exam" onclick="selectOnboarding(this)"><strong>🎯 Objectif ANACRIM</strong><p>Parcours normal + défis mélangés et révision prioritaire des erreurs.</p></div>
+    <div class="onboard-option" data-mode="fast" onclick="selectOnboarding(this)"><strong>⚡ Je veux m’entraîner vite</strong><p>Sessions courtes de 5 questions, avec priorité aux points faibles.</p></div>
+    <button class="btn btn-primary btn-wide" style="margin-top:14px" onclick="finishOnboarding()">C’est parti</button>
+  </div>
+</div>
+
+<script>
+const lessons = [
+  {id:'bases',emoji:'1️⃣',title:'Lire une REGEX',level:'Débutant',desc:'Comprendre ce qu’est un motif et les caractères littéraux.',questions:[
+    {concept:'bases',type:'mcq',q:'Une REGEX sert principalement à…',choices:['dessiner un graphique','décrire un motif à rechercher dans du texte','chiffrer un fichier','remplacer JavaScript'],answer:1,explain:'Une expression régulière décrit un motif que l’on peut rechercher, vérifier, extraire ou remplacer.'},
+    {concept:'bases',type:'mcq',q:'La REGEX <span class="mono">bonjour</span> cherche…',choices:['exactement les lettres « bonjour » dans cet ordre','un nombre','n’importe quel mot','la fin d’une ligne'],answer:0,explain:'Sans symbole spécial, les caractères sont lus littéralement.'},
+    {concept:'point',type:'mcq',q:'Dans une REGEX, le point <span class="mono">.</span> signifie…',choices:['un point littéral','n’importe quel caractère','un espace','une fin de ligne'],answer:1,explain:'Le point correspond à un caractère quelconque, selon les options du moteur.'},
+    {concept:'echappement',type:'text',q:'Écris une REGEX qui recherche littéralement « .com ».',placeholder:'Ex. \\.com',answers:['\\.com'],tests:{positive:['.com'],negative:['xcom']},explain:'Le point a un sens spécial. On l’échappe : <span class="mono">\\.com</span>.'}
+  ]},
+  {id:'shortcuts',emoji:'2️⃣',title:'Raccourcis utiles',level:'Débutant',desc:'Maîtriser \\d, \\w et \\s.',questions:[
+    {concept:'d',type:'mcq',q:'Que signifie <span class="mono">\\d</span> ?',choices:['un chiffre','une lettre','un espace','un point'],answer:0,explain:'<span class="mono">\\d</span> représente un chiffre.'},
+    {concept:'w',type:'mcq',q:'Que peut reconnaître <span class="mono">\\w</span> ?',choices:['uniquement une voyelle','lettre, chiffre ou underscore','uniquement un chiffre','uniquement un espace'],answer:1,explain:'<span class="mono">\\w</span> correspond généralement aux caractères de mot : lettres, chiffres et <span class="mono">_</span>.'},
+    {concept:'s',type:'mcq',q:'Quel raccourci représente un espace ou une tabulation ?',choices:['\\d','\\w','\\s','\\b'],answer:2,explain:'<span class="mono">\\s</span> représente un caractère d’espacement.'},
+    {concept:'d',type:'text',q:'Écris une REGEX qui reconnaît exactement 5 chiffres.',placeholder:'Ex. ^\\d{5}$',answers:['^\\d{5}$','^[0-9]{5}$'],tests:{positive:['39000','75001'],negative:['7500','ABCDE','39000 Paris']},explain:'Une forme robuste : <span class="mono">^\\d{5}$</span>.'}
+  ]},
+  {id:'brackets',emoji:'3️⃣',title:'Crochets [ ]',level:'Débutant',desc:'Choisir un caractère parmi un ensemble ou une plage.',questions:[
+    {concept:'crochets',type:'mcq',q:'Que signifie <span class="mono">[abc]</span> ?',choices:['le mot abc','a, b ou c','tout sauf a,b,c','trois lettres obligatoires'],answer:1,explain:'Les crochets sélectionnent un seul caractère parmi ceux listés.'},
+    {concept:'plages',type:'mcq',q:'Quelle classe correspond à une majuscule de A à Z ?',choices:['[a-z]','[0-9]','[A-Z]','[^A-Z]'],answer:2,explain:'<span class="mono">[A-Z]</span> couvre la plage des majuscules ASCII.'},
+    {concept:'negation',type:'mcq',q:'Dans <span class="mono">[^0-9]</span>, le <span class="mono">^</span> signifie…',choices:['début de chaîne','tout sauf les chiffres dans cette classe','fin de chaîne','répéter'],answer:1,explain:'À l’intérieur des crochets, placé au début, <span class="mono">^</span> nie la classe.'},
+    {concept:'plages',type:'text',q:'Écris une REGEX qui accepte exactement une lettre minuscule.',placeholder:'Ex. ^[a-z]$',answers:['^[a-z]$'],tests:{positive:['a','z','m'],negative:['A','ab','7']},explain:'<span class="mono">^[a-z]$</span> = une seule minuscule du début à la fin.'}
+  ]},
+  {id:'quantifiers',emoji:'4️⃣',title:'Quantificateurs',level:'Débutant+',desc:'Dire combien de fois un motif peut apparaître.',questions:[
+    {concept:'plus',type:'mcq',q:'Que signifie <span class="mono">+</span> ?',choices:['0 ou 1 fois','1 ou plusieurs fois','0 ou plusieurs fois','exactement 2 fois'],answer:1,explain:'<span class="mono">+</span> exige au moins une occurrence.'},
+    {concept:'etoile',type:'mcq',q:'Quelle différence entre <span class="mono">*</span> et <span class="mono">+</span> ?',choices:['aucune','* accepte zéro occurrence, + non','+ accepte zéro occurrence, * non','* signifie « fin »'],answer:1,explain:'<span class="mono">*</span> = 0 ou plus ; <span class="mono">+</span> = 1 ou plus.'},
+    {concept:'accolades',type:'mcq',q:'Que signifie <span class="mono">{2,5}</span> ?',choices:['2 ou 5 uniquement','entre 2 et 5 occurrences','au moins 5','exactement 25'],answer:1,explain:'Les accolades permettent de fixer une quantité minimale et maximale.'},
+    {concept:'accolades',type:'text',q:'Écris une REGEX pour exactement 3 lettres minuscules.',placeholder:'Ex. ^[a-z]{3}$',answers:['^[a-z]{3}$'],tests:{positive:['abc','xyz'],negative:['ab','abcd','ABC']},explain:'<span class="mono">{3}</span> impose exactement trois répétitions.'}
+  ]},
+  {id:'anchors',emoji:'5️⃣',title:'Ancres ^ et $',level:'Intermédiaire',desc:'Vérifier un format complet, pas seulement un morceau.',questions:[
+    {concept:'ancres',type:'mcq',q:'À quoi sert <span class="mono">^</span> hors des crochets ?',choices:['début de chaîne','fin de chaîne','un chiffre','une alternative'],answer:0,explain:'<span class="mono">^</span> ancre le début de la chaîne ou de la ligne selon le mode.'},
+    {concept:'ancres',type:'mcq',q:'Pourquoi préférer <span class="mono">^\\d{5}$</span> à <span class="mono">\\d{5}</span> pour vérifier un code postal ?',choices:['aucune raison','pour obliger tout le texte à être composé de 5 chiffres','pour ajouter un sixième chiffre','pour ignorer les chiffres'],answer:1,explain:'Les ancres empêchent que cinq chiffres soient seulement trouvés à l’intérieur d’un texte plus long.'},
+    {concept:'b',type:'mcq',q:'Que signifie <span class="mono">\\b</span> ?',choices:['un retour arrière','une frontière de mot','un chiffre','une parenthèse'],answer:1,explain:'<span class="mono">\\b</span> marque une frontière de mot.'},
+    {concept:'ancres',type:'text',q:'Écris une REGEX pour une date simple JJ/MM/AAAA.',placeholder:'Ex. ^\\d{2}/\\d{2}/\\d{4}$',answers:['^\\d{2}/\\d{2}/\\d{4}$','^[0-9]{2}/[0-9]{2}/[0-9]{4}$'],tests:{positive:['01/12/2026','31/01/2025'],negative:['1/12/2026','01-12-2026','Date 01/12/2026']},explain:'Forme simple : <span class="mono">^\\d{2}/\\d{2}/\\d{4}$</span>. Elle vérifie le format, pas la validité réelle de la date.'}
+  ]},
+  {id:'groups',emoji:'6️⃣',title:'Groupes et alternatives',level:'Intermédiaire',desc:'Regrouper avec ( ) et choisir avec |.',questions:[
+    {concept:'alternative',type:'mcq',q:'Que signifie <span class="mono">chat|chien</span> ?',choices:['chat puis chien','chat ou chien','uniquement chat','tous les caractères entre crochets'],answer:1,explain:'Le symbole <span class="mono">|</span> représente une alternative.'},
+    {concept:'groupes',type:'mcq',q:'Pourquoi écrire <span class="mono">^(chat|chien)$</span> ?',choices:['pour grouper le choix et l’ancrer','pour créer un chiffre','pour ignorer chat','pour faire une plage'],answer:0,explain:'Les parenthèses regroupent l’alternative avant d’appliquer les ancres.'},
+    {concept:'groupes',type:'mcq',q:'Que signifie <span class="mono">(?:abc)</span> ?',choices:['groupe non capturant','négation de abc','trois alternatives','commentaire'],answer:0,explain:'<span class="mono">(?:...)</span> regroupe sans créer de groupe capturant.'},
+    {concept:'alternative',type:'text',q:'Écris une REGEX qui accepte exactement « oui » ou « non ».',placeholder:'Ex. ^(oui|non)$',answers:['^(oui|non)$','^(non|oui)$'],tests:{positive:['oui','non'],negative:['Oui','non merci','peut-être']},explain:'Une solution : <span class="mono">^(oui|non)$</span>.'}
+  ]},
+  {id:'escape',emoji:'7️⃣',title:'Échapper les symboles',level:'Intermédiaire',desc:'Distinguer symbole spécial et caractère littéral.',questions:[
+    {concept:'echappement',type:'mcq',q:'Pour chercher un point littéral, on écrit…',choices:['.','\\.','[.] uniquement obligatoire','..'],answer:1,explain:'Le point est spécial ; <span class="mono">\\.</span> signifie « un vrai point ».'},
+    {concept:'echappement',type:'mcq',q:'Quelle REGEX cherche littéralement <span class="mono">(test)</span> ?',choices:['(test)','\\(test\\)','[test]','test?'],answer:1,explain:'Les parenthèses ayant un rôle spécial, on les échappe : <span class="mono">\\(test\\)</span>.'},
+    {concept:'echappement',type:'mcq',q:'Quel caractère sert généralement à échapper ?',choices:['/','\\','_','#'],answer:1,explain:'L’antislash <span class="mono">\\</span> sert à échapper de nombreux métacaractères.'},
+    {concept:'echappement',type:'text',q:'Écris une REGEX qui reconnaît exactement « 1+1 ».',placeholder:'Ex. ^1\\+1$',answers:['^1\\+1$'],tests:{positive:['1+1'],negative:['11','1++1','x1+1']},explain:'Le <span class="mono">+</span> est spécial ; il faut écrire <span class="mono">\\+</span>.'}
+  ]},
+  {id:'formats',emoji:'8️⃣',title:'Formats concrets',level:'Intermédiaire+',desc:'Assembler plusieurs notions sur des cas utiles.',questions:[
+    {concept:'formats',type:'mcq',q:'Quelle REGEX correspond à un identifiant de type AB123 ?',choices:['^[A-Z]{2}\\d{3}$','^\\d{2}[A-Z]{3}$','^[A-Z]+$','^AB123?$'],answer:0,explain:'Deux majuscules puis trois chiffres : <span class="mono">^[A-Z]{2}\\d{3}$</span>.'},
+    {concept:'email',type:'mcq',q:'Laquelle ressemble à une vérification simple d’adresse mail ?',choices:['^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$','^\\d{5}$','^(oui|non)$','^[A-Z]{2}\\d{3}$'],answer:0,explain:'C’est une approximation utile pour l’exercice. La validation complète d’e-mail est plus complexe.'},
+    {concept:'formats',type:'text',q:'Écris une REGEX pour un code exactement composé de 2 majuscules puis 4 chiffres.',placeholder:'Ex. ^[A-Z]{2}\\d{4}$',answers:['^[A-Z]{2}\\d{4}$'],tests:{positive:['AB1234','ZX0001'],negative:['A1234','ab1234','AB12345']},explain:'On combine classe, quantificateurs et ancres : <span class="mono">^[A-Z]{2}\\d{4}$</span>.'},
+    {concept:'formats',type:'mcq',q:'Quel réflexe est le plus important quand tu construis une REGEX ?',choices:['la rendre la plus longue possible','tester un cas valide ET un cas invalide','éviter les ancres','mettre toujours .*'],answer:1,explain:'Une REGEX se valide avec des exemples positifs et négatifs, notamment sur les cas limites.'}
+  ]},
+  {id:'boss',emoji:'👾',title:'Boss final : mélange',level:'Boss',desc:'Questions mélangées avant le mode défi.',boss:true,questions:[
+    {concept:'mixte',type:'mcq',q:'Que reconnaît <span class="mono">^[A-Z]{2}\\d+$</span> ?',choices:['2 majuscules puis au moins un chiffre','2 chiffres puis une majuscule','exactement 2 majuscules','un e-mail'],answer:0,explain:'<span class="mono">[A-Z]{2}</span> = deux majuscules, puis <span class="mono">\\d+</span> = au moins un chiffre.'},
+    {concept:'mixte',type:'mcq',q:'Quelle expression est la plus stricte pour « 3 chiffres exactement » ?',choices:['\\d{3}','^\\d{3}$','\\d+','[0-9]*'],answer:1,explain:'Les ancres garantissent que toute la chaîne contient exactement trois chiffres.'},
+    {concept:'mixte',type:'text',q:'Écris une REGEX qui accepte exactement « A1 », « B1 » ou « C1 ».',placeholder:'Ex. ^[ABC]1$',answers:['^[ABC]1$','^(A|B|C)1$'],tests:{positive:['A1','B1','C1'],negative:['D1','A2','AA1']},explain:'La classe <span class="mono">[ABC]</span> est compacte ; une alternative fonctionnerait aussi.'},
+    {concept:'mixte',type:'mcq',q:'Si une REGEX est correcte sur un exemple mais accepte aussi des textes indésirables, elle est…',choices:['parfaite','trop permissive','forcément fausse syntaxiquement','chiffrée'],answer:1,explain:'Le piège classique est une REGEX trop permissive. Les cas négatifs servent à le détecter.'}
+  ]}
+];
+
+const conceptLabels={bases:'bases',point:'point .',echappement:'échappement',d:'\\d',w:'\\w',s:'\\s',crochets:'crochets',plages:'plages',negation:'négation',plus:'+',etoile:'*',accolades:'{ }',ancres:'ancres',b:'\\b',alternative:'alternative |',groupes:'groupes',formats:'formats',email:'e-mail',mixte:'mélange'};
+const DAILY_GOAL=30;
+const state={screen:'home',session:null,currentQuestion:0,selectedChoice:null,hearts:3,correct:0,mistakes:0,xpGain:0,profile:loadProfile(),onboardingMode:'gentle'};
+
+function defaultProfile(){return{xp:0,streak:0,lastPlayed:null,completedLessons:[],mistakes:[],weakness:{},settings:{sound:true},onboardingDone:false,mode:'gentle',examBest:null,daily:{date:null,xp:0,missionDone:false}}}
+function loadProfile(){try{const raw=localStorage.getItem('regexFunProfileV2')||localStorage.getItem('regexFunProfile');const p=raw?JSON.parse(raw):{};const d=defaultProfile();return{...d,...p,settings:{...d.settings,...(p.settings||{})},weakness:{...(p.weakness||{})},daily:{...d.daily,...(p.daily||{})}}}catch(e){return defaultProfile()}}
+function saveProfile(){localStorage.setItem('regexFunProfileV2',JSON.stringify(state.profile))}
+function localDateKey(date=new Date()){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
+function resetDailyIfNeeded(){const today=localDateKey();if(state.profile.daily.date!==today)state.profile.daily={date:today,xp:0,missionDone:false}}
+function updateStreak(){const today=localDateKey();const last=state.profile.lastPlayed;if(!last){state.profile.streak=1}else if(last!==today){const a=new Date(last+'T12:00:00'),b=new Date(today+'T12:00:00');const diff=Math.round((b-a)/86400000);state.profile.streak=diff===1?state.profile.streak+1:1}state.profile.lastPlayed=today;saveProfile()}
+function escapeHtml(str=''){return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function shuffle(arr,seed=null){const a=[...arr];let r=seed===null?Math.random:seeded(seed);for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function seeded(str){let h=2166136261;for(const c of str){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return()=>{h+=0x6D2B79F5;let t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function allQuestions(){return lessons.flatMap((l,li)=>l.questions.map((q,qi)=>({...q,_lessonId:l.id,_lessonTitle:l.title,_lessonIndex:li,_questionIndex:qi})))}
+function levelFromXP(xp){if(xp>=500)return'Chasseur de motifs';if(xp>=250)return'Analyste';if(xp>=100)return'Apprenti';return'Novice'}
+
+function playTone(type){if(!state.profile.settings.sound||!window.AudioContext&&!window.webkitAudioContext)return;try{const AC=window.AudioContext||window.webkitAudioContext;const ctx=new AC();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.type='sine';const map={ok:[660,.07],bad:[180,.10],tap:[440,.04],win:[880,.13]};const [f,d]=map[type]||map.tap;osc.frequency.value=f;gain.gain.setValueAtTime(.05,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d);osc.start();osc.stop(ctx.currentTime+d+.02);setTimeout(()=>ctx.close(),300)}catch(e){}}
+function bumpMascot(mood='happy'){const m=document.getElementById('mascot');if(!m)return;m.classList.remove('happy','sad');void m.offsetWidth;m.classList.add(mood);setTimeout(()=>m.classList.remove(mood),550)}
+function celebrate(){const symbols=['🎉','✨','⭐','💚','⚡','🎯'];for(let i=0;i<18;i++){const s=document.createElement('div');s.className='confetti';s.textContent=symbols[i%symbols.length];s.style.left=(5+Math.random()*90)+'vw';s.style.top=(3+Math.random()*10)+'vh';s.style.animationDelay=(Math.random()*.25)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),1600)}}
+
+function showScreen(name){state.screen=name;['home','learn','results','lab','memo','review','install','settings'].forEach(id=>document.getElementById('screen-'+id).classList.toggle('hidden',id!==name));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));document.getElementById('bottomNav').classList.toggle('hidden',name==='learn');if(name==='home')updateHome();if(name==='review')renderReview();if(name==='settings')renderSettings();window.scrollTo({top:0,behavior:'instant'})}
+function showInstall(){showScreen('install')}
+function showSettings(){showScreen('settings')}
+
+function updateHome(){resetDailyIfNeeded();document.getElementById('streakValue').textContent=state.profile.streak;document.getElementById('xpValue').textContent=state.profile.xp+' XP';document.getElementById('lessonsDone').textContent=state.profile.completedLessons.length;document.getElementById('mistakesCount').textContent=state.profile.mistakes.length;document.getElementById('examBest').textContent=state.profile.examBest==null?'—':state.profile.examBest+'%';document.getElementById('levelLabel').textContent='Niveau : '+levelFromXP(state.profile.xp);document.getElementById('courseSummary').textContent=`${state.profile.completedLessons.length} / ${lessons.length} niveaux validés`;document.getElementById('courseProgress').style.width=((state.profile.completedLessons.length/lessons.length)*100)+'%';document.getElementById('dailyGoalLabel').textContent=`${state.profile.daily.xp} / ${DAILY_GOAL} XP`;document.getElementById('dailyGoalProgress').style.width=Math.min(100,state.profile.daily.xp/DAILY_GOAL*100)+'%';
+  const next=lessons.findIndex(l=>!state.profile.completedLessons.includes(l.id));const nextIndex=next===-1?lessons.length-1:next;document.getElementById('continueBtn').onclick=()=>startLesson(nextIndex);
+  const hero=document.getElementById('heroText');hero.textContent=state.profile.mode==='fast'?'Mode rapide : sessions courtes et ciblées sur tes erreurs.':state.profile.mode==='exam'?'Mode ANACRIM : parcours complet + défis mélangés + révision ciblée.':'Mode doux : on commence vraiment par les bases et on monte progressivement.';
+  const list=document.getElementById('lessonList');list.innerHTML='';lessons.forEach((lesson,i)=>{const done=state.profile.completedLessons.includes(lesson.id);const best=state.profile['best_'+lesson.id];const card=document.createElement('div');card.className='card lesson-card '+(done?'done ':'')+(lesson.boss?'boss':'');card.innerHTML=`<div class="lesson-node">${done?'✓':lesson.emoji}</div><div class="lesson-score">${best!=null?best+'%':''}</div><div class="lesson-tag">${done?'✅ Validé':'🚀 À faire'} • ${lesson.level}</div><h3>${lesson.title}</h3><p>${lesson.desc}</p><div class="lesson-footer"><strong>${lesson.questions.length} questions</strong><button class="btn ${done?'btn-secondary':'btn-primary'}">${done?'Rejouer':'Commencer'}</button></div>`;card.querySelector('button').onclick=()=>startLesson(i);list.appendChild(card)});
+  const ach=document.getElementById('achievements');ach.innerHTML='';const badges=[];if(state.profile.completedLessons.length>=1)badges.push(['🌱 Premier niveau','']);if(state.profile.completedLessons.length>=4)badges.push(['⚡ 4 niveaux','blue']);if(state.profile.completedLessons.length===lessons.length)badges.push(['🏆 Parcours complet','purple']);if(state.profile.streak>=3)badges.push(['🔥 Série '+state.profile.streak+' jours','']);if(state.profile.xp>=100)badges.push(['⭐ '+state.profile.xp+' XP','blue']);if(state.profile.daily.missionDone)badges.push(['🎯 Mission du jour faite','purple']);if(!badges.length)badges.push(['🎯 Commence le niveau 1','']);badges.forEach(([t,c])=>{const s=document.createElement('span');s.className='chip '+c;s.textContent=t;ach.appendChild(s)});saveProfile()}
+
+function makeSession(type,title,desc,emoji,questions,lessonIndex=null){updateStreak();state.session={type,title,desc,emoji,questions:questions.map(q=>({...q})),lessonIndex};state.currentQuestion=0;state.selectedChoice=null;state.hearts=3;state.correct=0;state.mistakes=0;state.xpGain=0;showScreen('learn');renderQuestion()}
+function startLesson(index){const l=lessons[index];makeSession('lesson',l.title,l.desc,l.emoji,l.questions,index)}
+function startDailyMission(){resetDailyIfNeeded();const qs=shuffle(allQuestions(),localDateKey()).slice(0,5);makeSession('daily','Mission du jour','5 questions mélangées pour garder le rythme.','🎯',qs)}
+function startQuickSession(){const all=allQuestions();const weak=Object.entries(state.profile.weakness).sort((a,b)=>b[1]-a[1]).map(([k])=>k);let pool=[];for(const c of weak){pool.push(...all.filter(q=>q.concept===c))}pool.push(...all);const seen=new Set();pool=pool.filter(q=>{const k=q._lessonId+'::'+q.q;if(seen.has(k))return false;seen.add(k);return true});makeSession('quick','Session express','5 questions, priorité à tes points faibles.','⚡',shuffle(pool).slice(0,5))}
+function startExam(){makeSession('exam','Défi ANACRIM','10 questions mélangées, comme un mini test de réflexes.','🏆',shuffle(allQuestions()).slice(0,10))}
+function startReviewSession(concept=null){let pool=allQuestions();if(concept)pool=pool.filter(q=>q.concept===concept);else{const keys=new Set(state.profile.mistakes.map(m=>m.key));pool=pool.filter(q=>keys.has((q._lessonId||'')+'::'+q.q)||state.profile.mistakes.some(m=>m.q===q.q))}if(!pool.length){pool=allQuestions()}makeSession('review',concept?'Révision : '+(conceptLabels[concept]||concept):'Révision ciblée','On retravaille les notions qui ont posé problème.','🔁',shuffle(pool).slice(0,Math.min(6,pool.length)))}
+
+function normalizeRegexInput(s){return String(s||'').trim().replace(/\s+/g,'')}
+function semanticRegexCheck(pattern,tests){try{if(pattern.length>120)return false;const rx=new RegExp(pattern,tests.flags||'');return tests.positive.every(v=>rx.test(v)&&(rx.lastIndex=0,true))&&tests.negative.every(v=>!rx.test(v)&&(rx.lastIndex=0,true))}catch(e){return false}}
+function isCorrectAnswer(q,value){if(q.type==='mcq')return value===q.answer;const v=String(value||'').trim();if(q.tests&&semanticRegexCheck(v,q.tests))return true;const n=normalizeRegexInput(v);return (q.answers||[]).some(a=>normalizeRegexInput(a)===n)}
+function addMistake(q){const lessonId=q._lessonId||(state.session.type==='lesson'?lessons[state.session.lessonIndex].id:'mixed');const key=lessonId+'::'+q.q;const current=state.profile.mistakes.find(m=>m.key===key);const answer=q.type==='mcq'?q.choices[q.answer]:(q.answers||[])[0]||'Voir l’explication';if(current){current.count=(current.count||1)+1;current.last=localDateKey()}else state.profile.mistakes.push({key,lessonId,q:q.q,answer,explain:q.explain,concept:q.concept,count:1,last:localDateKey()});state.profile.weakness[q.concept]=(state.profile.weakness[q.concept]||0)+1;saveProfile()}
+function clearMistakeIfMastered(q){const lessonId=q._lessonId||(state.session.type==='lesson'?lessons[state.session.lessonIndex].id:'mixed');const key=lessonId+'::'+q.q;const idx=state.profile.mistakes.findIndex(m=>m.key===key);if(idx>=0){state.profile.mistakes[idx].mastery=(state.profile.mistakes[idx].mastery||0)+1;if(state.profile.mistakes[idx].mastery>=2)state.profile.mistakes.splice(idx,1);saveProfile()}}
+
+function renderQuestion(){const s=state.session,q=s.questions[state.currentQuestion];document.getElementById('lessonEmoji').textContent=s.emoji;document.getElementById('lessonTitle').textContent=s.title;document.getElementById('lessonDesc').textContent=s.desc;document.getElementById('lessonProgress').style.width=(state.currentQuestion/s.questions.length*100)+'%';document.getElementById('heartBox').textContent='❤️'.repeat(state.hearts)+'🩶'.repeat(3-state.hearts);document.getElementById('sessionQuestionCount').textContent=`Question ${state.currentQuestion+1}/${s.questions.length}`;document.getElementById('sessionScore').textContent=`✅ ${state.correct} • ❌ ${state.mistakes}`;
+  const card=document.getElementById('exerciseCard');let html=`<div class="question-label">${conceptLabels[q.concept]||'REGEX'} • question ${state.currentQuestion+1}</div><div class="question">${q.q}</div>`;
+  if(q.type==='mcq'){html+=`<div class="answer-grid">${q.choices.map((c,i)=>`<button class="choice" data-idx="${i}">${c}</button>`).join('')}</div>`}else{html+=`<input class="input-answer mono" id="textAnswer" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="120" placeholder="${escapeHtml(q.placeholder||'')}">`;if(q.tests)html+=`<div class="sample-tests">✅ doit accepter : ${q.tests.positive.map(v=>`<code>${escapeHtml(v)}</code>`).join(', ')}<br>❌ doit refuser : ${q.tests.negative.map(v=>`<code>${escapeHtml(v)}</code>`).join(', ')}</div>`}
+  html+=`<div class="row" style="margin-top:14px"><button class="btn btn-primary" id="validateBtn">Valider</button><button class="btn btn-soft" id="hintBtn">Indice</button></div><div id="feedback"></div>`;card.innerHTML=html;
+  if(q.type==='mcq')card.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{playTone('tap');state.selectedChoice=Number(btn.dataset.idx);card.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected')});
+  document.getElementById('hintBtn').onclick=()=>{document.getElementById('feedback').innerHTML='<div class="hint">💡 '+hintFor(q)+'</div>'};document.getElementById('validateBtn').onclick=validateQuestion}
+function hintFor(q){const m={bases:'Lis littéralement ce qui n’est pas un symbole spécial.',point:'Le point ne signifie pas forcément un point.',echappement:'Quand un symbole est spécial, pense à l’antislash.',d:'Le d vient de « digit ».',w:'Pense à « word ».',s:'Pense à « space ».',crochets:'Les crochets choisissent un caractère.',plages:'Une plage utilise un tiret.',negation:'Le ^ change de rôle lorsqu’il est au début d’une classe.',plus:'Le + impose au moins une occurrence.',etoile:'L’étoile accepte même zéro occurrence.',accolades:'Les accolades donnent une quantité.',ancres:'Demande-toi si tout le texte doit respecter le format.',b:'Pense à la limite entre un mot et le reste.',alternative:'Le | signifie « ou ».',groupes:'Les parenthèses regroupent.',formats:'Découpe le format en blocs simples.',email:'Repère utilisateur, @, domaine et extension.',mixte:'Découpe la REGEX morceau par morceau.'};return m[q.concept]||'Décompose le motif en petits morceaux.'}
+function validateQuestion(){const q=state.session.questions[state.currentQuestion],feedback=document.getElementById('feedback');const value=q.type==='mcq'?state.selectedChoice:document.getElementById('textAnswer').value;if(q.type==='mcq'&&value===null){feedback.innerHTML='<div class="hint">Choisis une réponse avant de valider 🙂</div>';return}if(q.type==='text'&&!String(value).trim()){feedback.innerHTML='<div class="hint">Écris une réponse avant de valider 🙂</div>';return}const ok=isCorrectAnswer(q,value);
+  if(q.type==='mcq'){document.querySelectorAll('.choice').forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add('correct');if(i===value&&i!==q.answer)b.classList.add('wrong')})}else document.getElementById('textAnswer').disabled=true;
+  if(ok){state.correct++;state.xpGain+=10;clearMistakeIfMastered(q);feedback.innerHTML=`<div class="explanation good">✅ Bien joué ! ${q.explain}</div><div class="row" style="margin-top:12px"><button class="btn btn-primary" id="nextQBtn">Continuer</button></div>`;playTone('ok');bumpMascot('happy')}else{state.mistakes++;state.hearts=Math.max(0,state.hearts-1);addMistake(q);const right=q.type==='mcq'?q.choices[q.answer]:(q.answers||[])[0]||'';feedback.innerHTML=`<div class="explanation bad">❌ Pas encore. Bonne réponse possible : <span class="mono">${escapeHtml(right)}</span><br>${q.explain}</div><div class="row" style="margin-top:12px"><button class="btn btn-primary" id="nextQBtn">Continuer</button></div>`;playTone('bad');bumpMascot('sad')}
+  document.getElementById('heartBox').textContent='❤️'.repeat(state.hearts)+'🩶'.repeat(3-state.hearts);document.getElementById('sessionScore').textContent=`✅ ${state.correct} • ❌ ${state.mistakes}`;document.getElementById('validateBtn').disabled=true;document.getElementById('hintBtn').disabled=true;document.getElementById('nextQBtn').onclick=nextQuestion}
+function nextQuestion(){state.currentQuestion++;state.selectedChoice=null;if(state.currentQuestion>=state.session.questions.length)finishSession();else renderQuestion()}
+function finishSession(){const s=state.session;const pct=Math.round(state.correct/s.questions.length*100);let bonus=0;if(pct===100)bonus=10;state.xpGain+=bonus;state.profile.xp+=state.xpGain;resetDailyIfNeeded();state.profile.daily.xp+=state.xpGain;
+  if(s.type==='lesson'){const l=lessons[s.lessonIndex];if(!state.profile.completedLessons.includes(l.id)&&pct>=60)state.profile.completedLessons.push(l.id);const key='best_'+l.id;state.profile[key]=Math.max(state.profile[key]||0,pct)}if(s.type==='daily')state.profile.daily.missionDone=true;if(s.type==='exam')state.profile.examBest=Math.max(state.profile.examBest||0,pct);saveProfile();
+  document.getElementById('resultEmoji').textContent=pct===100?'🌟':pct>=80?'🏆':pct>=60?'🎯':'💪';document.getElementById('resultTitle').textContent=pct===100?'Sans faute !':pct>=80?'Très solide !':pct>=60?'Session validée !':'À retravailler';document.getElementById('resultText').textContent=pct===100?'Tu as tout juste. Garde le rythme.':pct>=80?'Les réflexes commencent à s’installer.':pct>=60?'Le niveau est acquis, mais une révision te fera gagner en vitesse.':'Ce n’est pas perdu : les erreurs sont maintenant ciblées pour la prochaine session.';document.getElementById('resultScore').textContent=pct+'%';document.getElementById('resultXP').textContent=state.xpGain+' XP';document.getElementById('resultHearts').textContent='❤️'.repeat(state.hearts)||'0';document.getElementById('resultNote').textContent=state.mistakes?`${state.mistakes} erreur(s) enregistrée(s) dans la révision ciblée.`:'Aucune nouvelle erreur à revoir.';
+  const btn=document.getElementById('resultPrimaryBtn');if(s.type==='lesson'&&s.lessonIndex<lessons.length-1){btn.textContent='Niveau suivant';btn.onclick=()=>startLesson(s.lessonIndex+1)}else{btn.textContent='Retour à l’accueil';btn.onclick=()=>showScreen('home')}showScreen('results');if(pct>=80){celebrate();playTone('win')}}
+function confirmLeaveSession(){if(!state.session||state.currentQuestion===0){showScreen('home');return}if(confirm('Quitter cette session ? La session en cours ne sera pas comptabilisée.'))showScreen('home')}
+
+function renderReview(){const weak=document.getElementById('weaknessContainer');weak.innerHTML='';const entries=Object.entries(state.profile.weakness).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,6);if(!entries.length){weak.innerHTML='<div class="hint">Aucun point faible détecté pour l’instant.</div>'}else{const max=entries[0][1];entries.forEach(([c,v])=>{const row=document.createElement('div');row.className='weak-row';row.innerHTML=`<div class="grow"><strong>${conceptLabels[c]||c}</strong><div class="bar"><span style="width:${Math.round(v/max*100)}%"></span></div></div><small>${v}</small><button class="btn btn-soft" style="min-height:38px;padding:8px 10px">Réviser</button>`;row.querySelector('button').onclick=()=>startReviewSession(c);weak.appendChild(row)})}
+  const c=document.getElementById('reviewContainer');c.innerHTML='';document.getElementById('reviewCount').textContent=state.profile.mistakes.length+' à revoir';if(!state.profile.mistakes.length){c.innerHTML='<div class="card"><h3>🎉 Rien à revoir</h3><p>Les erreurs maîtrisées disparaissent après plusieurs bonnes réponses.</p></div>';return}state.profile.mistakes.slice().sort((a,b)=>(b.count||1)-(a.count||1)).forEach((m,idx)=>{const div=document.createElement('div');div.className='card';div.style.marginTop='12px';div.innerHTML=`<div class="badge">${conceptLabels[m.concept]||m.concept||'REGEX'} • ${m.count||1} erreur(s)</div><h3 style="margin-top:10px">${m.q}</h3><p><strong>Bonne réponse :</strong> <span class="mono">${escapeHtml(m.answer)}</span></p><div class="hint" style="margin-top:10px">${m.explain}</div>`;c.appendChild(div)});if(state.profile.mistakes.length){const b=document.createElement('button');b.className='btn btn-primary btn-wide';b.style.marginTop='12px';b.textContent='🔁 Lancer une révision ciblée';b.onclick=()=>startReviewSession();c.appendChild(b)}}
+
+function getFlags(){return(document.getElementById('flagI').checked?'i':'')+(document.getElementById('flagG').checked?'g':'')+(document.getElementById('flagM').checked?'m':'')}
+function regexWorkerRun(pattern,text,flags){return new Promise((resolve,reject)=>{if(!window.Worker||!window.Blob){reject(new Error('Le moteur sécurisé n’est pas disponible dans ce navigateur.'));return}const code=`self.onmessage=e=>{try{const {pattern,text,flags}=e.data;const rx=new RegExp(pattern,flags);const matches=[];if(flags.includes('g')){let m;let guard=0;while((m=rx.exec(text))!==null&&guard<500){matches.push({index:m.index,value:m[0]});if(m[0]==='')rx.lastIndex++;guard++}}else{const m=rx.exec(text);if(m)matches.push({index:m.index,value:m[0]})}self.postMessage({ok:true,matches})}catch(err){self.postMessage({ok:false,error:err.message})}}`;const url=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));const w=new Worker(url);const timer=setTimeout(()=>{w.terminate();URL.revokeObjectURL(url);reject(new Error('Calcul interrompu : REGEX trop lente ou trop complexe.'))},600);w.onmessage=e=>{clearTimeout(timer);w.terminate();URL.revokeObjectURL(url);e.data.ok?resolve(e.data.matches):reject(new Error(e.data.error))};w.onerror=()=>{clearTimeout(timer);w.terminate();URL.revokeObjectURL(url);reject(new Error('Erreur du moteur REGEX.'))};w.postMessage({pattern,text,flags})})}
+async function runLab(){const output=document.getElementById('labOutput');const pattern=document.getElementById('labRegex').value,text=document.getElementById('labText').value,flags=getFlags();if(pattern.length>120||text.length>5000){output.textContent='Entrée trop longue : 120 caractères maximum pour la REGEX et 5000 pour le texte.';return}output.textContent='Analyse…';try{const matches=await regexWorkerRun(pattern,text,flags);if(!matches.length){output.textContent='Aucune correspondance trouvée.';return}let html='',pos=0;for(const m of matches){if(m.index<pos)continue;html+=escapeHtml(text.slice(pos,m.index));html+='<span class="match">'+escapeHtml(m.value||'∅')+'</span>';pos=m.index+m.value.length;if(m.value==='')pos=m.index}html+=escapeHtml(text.slice(pos));html+=`\n\n${matches.length} correspondance(s).`;output.innerHTML=html}catch(e){output.textContent=e.message}}
+function explainRegex(){const src=document.getElementById('labRegex').value,out=document.getElementById('explainOutput');if(src.length>120){out.textContent='REGEX trop longue pour le décodeur.';return}const parts=[];let i=0;while(i<src.length){const ch=src[i];if(ch==='^'){parts.push('• <span class="mono">^</span> = début');i++;continue}if(ch==='$'){parts.push('• <span class="mono">$</span> = fin');i++;continue}if(ch==='\\'){const n=src[i+1]||'';const map={d:'un chiffre',D:'un non-chiffre',w:'lettre / chiffre / _',W:'tout sauf \\w',s:'un espace',S:'un non-espace',b:'frontière de mot','.':'point littéral','+':'+ littéral','(':'( littéral',')':') littéral'};parts.push(`• <span class="mono">\\${escapeHtml(n)}</span> = ${map[n]||'séquence échappée'}`);i+=2;continue}if(ch==='['){const j=src.indexOf(']',i);if(j!==-1){parts.push(`• <span class="mono">${escapeHtml(src.slice(i,j+1))}</span> = classe de caractères`);i=j+1;continue}}if(ch==='('){const j=src.indexOf(')',i);if(j!==-1){parts.push(`• <span class="mono">${escapeHtml(src.slice(i,j+1))}</span> = groupe`);i=j+1;continue}}if(ch==='+'){parts.push('• <span class="mono">+</span> = 1 ou plusieurs');i++;continue}if(ch==='*'){parts.push('• <span class="mono">*</span> = 0 ou plusieurs');i++;continue}if(ch==='?'){parts.push('• <span class="mono">?</span> = 0 ou 1 / modificateur selon contexte');i++;continue}if(ch==='{'){const j=src.indexOf('}',i);if(j!==-1){parts.push(`• <span class="mono">${escapeHtml(src.slice(i,j+1))}</span> = quantité`);i=j+1;continue}}if(ch==='|'){parts.push('• <span class="mono">|</span> = ou');i++;continue}if(ch==='.'){parts.push('• <span class="mono">.</span> = n’importe quel caractère');i++;continue}parts.push(`• <span class="mono">${escapeHtml(ch)}</span> = caractère littéral`);i++}out.innerHTML=parts.length?parts.join('<br>'):'Rien à expliquer.'}
+
+function renderSettings(){const t=document.getElementById('soundToggle');t.classList.toggle('on',!!state.profile.settings.sound)}
+function toggleSound(){state.profile.settings.sound=!state.profile.settings.sound;saveProfile();renderSettings();if(state.profile.settings.sound)playTone('ok')}
+function resetProgress(){if(!confirm('Réinitialiser toute la progression Regex Fun ?'))return;const keepSettings={...state.profile.settings};state.profile=defaultProfile();state.profile.settings=keepSettings;state.profile.onboardingDone=true;saveProfile();updateHome();showScreen('home')}
+
+function selectOnboarding(el){document.querySelectorAll('.onboard-option').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');state.onboardingMode=el.dataset.mode}
+function finishOnboarding(){state.profile.mode=state.onboardingMode;state.profile.onboardingDone=true;saveProfile();document.getElementById('onboarding').classList.add('hidden');updateHome();if(state.onboardingMode==='fast')startQuickSession()}
+
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();window._installPrompt=e});
+document.addEventListener('DOMContentLoaded',()=>{resetDailyIfNeeded();updateHome();showScreen('home');if(!state.profile.onboardingDone)document.getElementById('onboarding').classList.remove('hidden');if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{})});
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "Regex Fun — Objectif ANACRIM",
+  "short_name": "Regex Fun",
+  "description": "Entraînement ludique aux expressions régulières, avec parcours progressif, révision ciblée et mode défi.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f8fc",
+  "theme_color": "#58cc02",
+  "lang": "fr",
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png"},
+    {"src":"icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}
